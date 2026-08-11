@@ -1,0 +1,28 @@
+.home {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.home__message {
+  margin: 0 0 1.5rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.home__message--error {
+  color: #ff6b6b;
+}
+
+.home__movie-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.home__movie-list > li {
+  display: flex;
+  min-height: 100%;
+}
