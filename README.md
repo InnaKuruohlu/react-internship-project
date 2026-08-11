@@ -2,17 +2,6 @@
 
 A React + TypeScript + Vite movie search app with favourites (Firebase Realtime Database) and authentication (Firebase Auth), built with an MVVM structure.
 
-## Setup
-
-```bash
-npm install
-npm run dev
-```
-
-Copy `.env.example` to `.env` and fill in your OMDb and Firebase keys.
-
----
-
 ## Prompts used to build this app
 
 The prompts below are the ones used step by step while building the project.
@@ -642,17 +631,6 @@ The prompts below are the ones used step by step while building the project.
 
 > transfer the Login/Logout button after the Favourites buttton
 
-**This README**
+**Documentation**
 
 > create me in read me all prompts that we used for this app
-
----
-
-## Scripts
-
-| Command           | Description              |
-| ----------------- | ------------------------ |
-| `npm run dev`     | Start development server |
-| `npm run build`   | Production build         |
-| `npm run preview` | Preview production build |
-| `npm run lint`    | Run oxlint               |
