@@ -39,7 +39,7 @@ describe('Header', () => {
       setQuery: vi.fn(),
       handleSearch: vi.fn(),
       loadInitialMovies: vi.fn(),
-    } as ReturnType<typeof useHomeViewModel>)
+    } as unknown as ReturnType<typeof useHomeViewModel>)
   })
 
   it('shows the Login link and navigation links when signed out', () => {
