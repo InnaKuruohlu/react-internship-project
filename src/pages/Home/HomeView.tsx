@@ -30,6 +30,7 @@ function HomeView() {
 
   return (
     <main className="home">
+      <h1 className="home__title">Find your next movie</h1>
       <form className="home__mood" onSubmit={onMoodSubmit}>
         <label className="home__mood-label" htmlFor="home-mood">
           Describe what you want to watch
