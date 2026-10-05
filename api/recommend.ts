@@ -1,6 +1,8 @@
 const DEFAULT_MODEL = 'gemini-3.5-flash-lite'
+const DEFAULT_FALLBACK_MODEL = 'gemini-2.5-flash-lite'
 const MAX_MOOD_LENGTH = 200
-const GEMINI_TIMEOUT_MS = 8000
+const GEMINI_TIMEOUT_MS = 6000
+const GEMINI_RETRY_DELAY_MS = 1000
 const GEMINI_ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models'
 
 const SYSTEM_INSTRUCTION = [
@@ -116,6 +118,34 @@ async function recommendTitles(mood: string): Promise<string[]> {
   }
 
   const model = process.env.GEMINI_MODEL?.trim() || DEFAULT_MODEL
+
+  try {
+    return await requestTitles(mood, apiKey, model)
+  } catch (error) {
+    if (!isRetryableGeminiFailure(error)) {
+      throw error
+    }
+
+    await delay(GEMINI_RETRY_DELAY_MS)
+    const fallbackModel = process.env.GEMINI_FALLBACK_MODEL?.trim() || DEFAULT_FALLBACK_MODEL
+    return requestTitles(mood, apiKey, fallbackModel)
+  }
+}
+
+function isRetryableGeminiFailure(error: unknown): boolean {
+  return (
+    error instanceof RecommendationError &&
+    (error.failureLog === 503 || error.failureLog === 'AbortError')
+  )
+}
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms)
+  })
+}
+
+async function requestTitles(mood: string, apiKey: string, model: string): Promise<string[]> {
   const url = `${GEMINI_ENDPOINT}/${encodeURIComponent(model)}:generateContent`
 
   const controller = new AbortController()
