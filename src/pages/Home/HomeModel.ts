@@ -1,4 +1,5 @@
 import { searchMovies } from '../../services/omdbMovieService'
+import { getRecommendedTitles } from '../../services/recommendService'
 import type { Movie } from '../../types/movie'
 
 const SEED_KEYWORDS = [
@@ -41,6 +42,39 @@ export async function getMovies(query: string): Promise<Movie[]> {
   }
 
   return searchMovies(cleanedQuery)
+}
+
+export async function getMoviesByMood(mood: string): Promise<Movie[]> {
+  const cleanedMood = mood.trim()
+
+  if (cleanedMood.length < 3) {
+    throw new Error('Mood must be at least 3 characters.')
+  }
+
+  const titles = await getRecommendedTitles(cleanedMood)
+  const results = await Promise.all(
+    titles.map(async (title) => {
+      try {
+        const movies = await searchMovies(title)
+        return movies[0]
+      } catch {
+        return undefined
+      }
+    }),
+  )
+
+  const uniqueMovies = new Map<string, Movie>()
+  for (const movie of results) {
+    if (movie) {
+      uniqueMovies.set(movie.imdbID, movie)
+    }
+  }
+
+  if (uniqueMovies.size === 0) {
+    throw new Error('No movies found for that mood.')
+  }
+
+  return [...uniqueMovies.values()]
 }
 
 export async function initialMovies(): Promise<Movie[]> {
