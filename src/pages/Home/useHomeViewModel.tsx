@@ -9,8 +9,10 @@ import {
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { saveFavourite } from '../Favourites/FavouritesModel'
-import { getMovies, initialMovies } from './HomeModel'
+import { getMovies, getMoviesByMood, initialMovies } from './HomeModel'
 import type { Movie } from '../../types/movie'
+
+type MoodStatus = 'idle' | 'loading' | 'success' | 'error'
 
 type HomeViewModel = {
   query: string
@@ -21,6 +23,13 @@ type HomeViewModel = {
   handleSearch: () => Promise<void>
   loadInitialMovies: () => Promise<void>
   handleFavouriteClick: (movie: Movie) => void
+  mood: string
+  setMood: (mood: string) => void
+  moodMovies: Movie[]
+  moodStatus: MoodStatus
+  moodError: string | null
+  submittedMood: string
+  submitMood: () => Promise<void>
 }
 
 const HomeViewModelContext = createContext<HomeViewModel | null>(null)
@@ -32,7 +41,13 @@ export function HomeViewModelProvider({ children }: { children: ReactNode }) {
   const [movies, setMovies] = useState<Movie[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [mood, setMood] = useState('')
+  const [submittedMood, setSubmittedMood] = useState('')
+  const [moodMovies, setMoodMovies] = useState<Movie[]>([])
+  const [moodStatus, setMoodStatus] = useState<MoodStatus>('idle')
+  const [moodError, setMoodError] = useState<string | null>(null)
   const requestIdRef = useRef(0)
+  const moodRequestIdRef = useRef(0)
 
   const loadInitialMovies = useCallback(async () => {
     const requestId = ++requestIdRef.current
@@ -103,6 +118,41 @@ export function HomeViewModelProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  async function submitMood() {
+    const requestId = ++moodRequestIdRef.current
+    const searchedMood = mood.trim()
+    setMoodStatus('loading')
+    setMoodError(null)
+
+    try {
+      const results = await getMoviesByMood(mood)
+
+      if (requestId !== moodRequestIdRef.current) {
+        return
+      }
+
+      setSubmittedMood(searchedMood)
+      setMoodMovies(results)
+      setMoodStatus('success')
+    } catch (err) {
+      if (requestId !== moodRequestIdRef.current) {
+        return
+      }
+
+      const message = err instanceof Error ? err.message : 'Something went wrong.'
+
+      if (message === 'No movies found for that mood.') {
+        setSubmittedMood(searchedMood)
+        setMoodMovies([])
+        setMoodStatus('success')
+        return
+      }
+
+      setMoodStatus('error')
+      setMoodError(message)
+    }
+  }
+
   function handleFavouriteClick(movie: Movie) {
     if (!user) {
       navigate('/favourites')
@@ -123,6 +173,13 @@ export function HomeViewModelProvider({ children }: { children: ReactNode }) {
         handleSearch,
         loadInitialMovies,
         handleFavouriteClick,
+        mood,
+        setMood,
+        moodMovies,
+        moodStatus,
+        moodError,
+        submittedMood,
+        submitMood,
       }}
     >
       {children}
