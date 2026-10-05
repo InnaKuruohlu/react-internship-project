@@ -9,5 +9,9 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: './src/test/setup.ts',
+    coverage: {
+      include: ['src/components/**', 'src/pages/**', 'src/services/**'],
+      exclude: ['**/*.test.ts', '**/*.test.tsx', 'src/test/**'],
+    },
   },
 })
