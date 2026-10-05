@@ -4,6 +4,12 @@
   padding: 2rem 1.5rem;
 }
 
+.home__title {
+  margin: 0 0 1.25rem;
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
 .home__message {
   margin: 0 0 1.5rem;
   color: rgba(255, 255, 255, 0.8);
