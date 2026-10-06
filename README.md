@@ -1,658 +1,202 @@
-# Internship React Project — Movie Finder
+# Movie Finder: find movies by title or by mood
 
-A React + TypeScript + Vite movie search app with favourites (Firebase Realtime Database) and authentication (Firebase Auth), built with an MVVM structure.
+**Live app:** https://react-internship-project-navy.vercel.app
+**Code:** https://github.com/InnaKuruohlu/react-internship-project
 
-## Setup
+## Project brief
+
+Movie Finder helps people who do not know the name of a movie, but know what they feel like watching. A normal search needs a title. So I added a box where users can write what a film they are looking for by writting something like "cozy and funny for tonight". The app sends this text to Google Gemini, and Gemini suggests a few movie titles. The app then looks up each title in OMDb and shows the movies as normal cards. It is made for people who want a suggestion, not a search box. Finally,I work on the AI part and to make the app ready for production.
+
+## What the app does
+
+- Search movies by title (OMDb)
+- **AI mood search:** write what you want to watch (any language) and get movies
+- Sign up and log in (Firebase Authentication)
+- Save favourite movies for each user (Firebase Realtime Database)
+- `/favourites` is only for logged-in users. `/auth` is only for guests.
+- Loading, error and empty messages
+
+## Run it on your computer
+
+You need Node.js 20 or newer.
 
 ```bash
-npm install
-npm run dev
+npm install && npm run dev
 ```
 
-Copy `.env.example` to `.env` and fill in your OMDb and Firebase keys.
-
----
-
-## Prompts used to build this app
-
-The prompts below are the ones used step by step while building the project.
-
-### 1. Project setup
-
-**Initialize React app**
-
-> Initialize a new React application using Vite, React, and TypeScript.
->
-> Use functional components only.
->
-> Do not install any UI library.
->
-> Do not add any movie functionality yet.
-
-**Remove Vite boilerplate**
-
-> Remove all default Vite content, images, styles, and demonstration code.
->
-> Leave a minimal working React application with an empty App component.
->
-> Do not create any additional components or functionality.
-
----
-
-### 2. Header
-
-**Create Header**
-
-> Create a reusable Header component.
->
-> The Header should contain:
->
-> - a Home navigation link
-> - a Favourites navigation link
-> - a search input
-> - a Search button
->
-> Use React Router links for navigation.
->
-> Only create and display the Header.
->
-> Do not create the Home or Favourites screens yet.
->
-> Do not connect the search input to any functionality.
-
-**Style Header**
-
-> please can you add styling to the header
-
----
-
-### 3. MVVM scaffolds
-
-**Home MVVM structure**
-
-> Create the empty MVVM file structure for the Home screen.
->
-> Create:
->
-> src/pages/Home/HomeModel.ts
-> src/pages/Home/useHomeViewModel.ts
-> src/pages/Home/HomeView.tsx
->
-> Requirements:
->
-> - HomeModel.ts will later contain Home-specific data and business logic.
-> - useHomeViewModel.ts will later contain React state and actions.
-> - HomeView.tsx will later render the Home interface.
->
-> Create only minimal placeholder exports so the application can compile.
->
-> Do not add API requests, React state, or movie UI.
-
-**Favourites MVVM structure**
-
-> Create the empty MVVM file structure for the Favourites screen.
->
-> Create:
->
-> src/pages/Favourites/FavouritesModel.ts
-> src/pages/Favourites/useFavouritesViewModel.ts
-> src/pages/Favourites/FavouritesView.tsx
->
-> Create only minimal placeholder exports so the application can compile.
->
-> Do not add Firebase, state, movie cards, or other functionality.
-
----
-
-### 4. OMDb service
-
-**Empty OMDb service**
-
-> Create a services folder and an empty OMDb movie service file:
->
-> src/services/omdbMovieService.ts
->
-> Add a short comment explaining that this file will contain communication with the OMDb API.
->
-> Do not implement the API request yet.
-
-**Implement searchMovies**
-
-> Implement the OMDb movie search request inside:
->
-> src/services/omdbMovieService.ts
->
-> Create an exported async function:
->
-> searchMovies(query: string): Promise\<Movie[]>
->
-> Requirements:
->
-> - use the OMDb API
-> - read the API key from VITE_OMDB_API_KEY
-> - encode the search query
-> - use the Movie and OmdbSearchResponse types
-> - return the Search array as Movie[]
-> - throw a readable error when the HTTP request fails
-> - throw a readable error when OMDb returns Response: "False"
->
-> For the API_URL use https://www.omdbapi.com/
->
-> Do not use React hooks.
-> Do not use useEffect.
-> Do not manage loading, error, or component state.
-
-**Temporary test / console logs**
-
-> okay add console logs just to double check if it works
-
-> okay import {SearchMovies} to the @src/App.tsx file with creating temporary test call
-
-> please make the temporary test call like from the screenshot
-
-> [OMDb] Test failed: Error: OMDb request failed with status 401.
-
----
-
-### 5. Home screen (Model → ViewModel → View)
-
-**HomeModel**
-
-> Implement the Home model inside:
->
-> src/pages/Home/HomeModel.ts
->
-> Import searchMovies from omdbMovieService.
->
-> Create and export:
->
-> getMovies(query: string): Promise\<Movie[]>
->
-> Responsibilities:
->
-> - trim the query
-> - validate that the query contains at least two characters
-> - call searchMovies with the cleaned query
-> - return the movie list
->
-> Do not use React hooks.
-> Do not use useState or useEffect.
-> Do not call fetch directly.
-
-**useHomeViewModel**
-
-> Implement a custom hook inside:
->
-> src/pages/Home/useHomeViewModel.ts
->
-> Create and export:
->
-> useHomeViewModel()
->
-> Manage these properties using useState:
->
-> - query
-> - movies
-> - loading
-> - error
->
-> Create a function:
->
-> handleSearch()
->
-> The function should:
->
-> - set loading to true
-> - clear the previous error
-> - call getMovies from HomeModel using the current query
-> - save the returned movie list in movies state
-> - store a readable error if the request fails
-> - set loading to false when finished
->
-> Return:
->
-> - query
-> - setQuery
-> - movies
-> - loading
-> - error
-> - handleSearch
->
-> Do not render JSX.
-> Do not call fetch directly.
-> Do not import omdbMovieService directly.
-
-**HomeView**
-
-> Implement the Home view inside:
->
-> src/pages/Home/HomeView.tsx
->
-> Requirements:
->
-> - import and use useHomeViewModel
-> - display the current search input
-> - connect the input value to query
-> - update query using setQuery
-> - call handleSearch when the Search button is clicked
-> - also allow searching by submitting the form
-> - display a loading message while loading is true
-> - display the error message when error exists
-> - render the movie list using .map()
-> - display the movie title, year, type, and poster
->
-> Do not call fetch directly.
-> Do not import HomeModel or omdbMovieService.
-> Do not implement favourites yet.
-> Do not create a reusable MovieCard component yet.
-
-**Remove duplicate search from HomeView**
-
-> we dont need here search input because we have it already in the header
-
-**initialMovies**
-
-> Create an initialMovies() function inside HomeModel.
->
-> Requirements:
->
-> - automatically fetch at least 20 movies when the Home screen opens
-> - every application launch should display a different selection of movies
-> - generate the movie list by randomly selecting search keywords from a predefined seed list (for example: Batman, Avengers, Harry Potter, Star Wars, Spider-Man, Marvel, Disney, Matrix, Lord of the Rings, Fast, Mission Impossible, Pixar, Horror, Comedy, Action)
-> - use Promise.all to execute requests in parallel
-> - merge all results into a single array
-> - remove duplicate movies using imdbID
-> - shuffle the final array
-> - return exactly 20 unique movies
-> - keep all fetching logic inside HomeModel
-> - use the existing omdbMovieService
-> - do not use React hooks
-> - do not call fetch directly
-
-**MovieCard**
-
-> Create a reusable MovieCard component.
->
-> Create:
->
-> src/components/MovieCard/MovieCard.tsx
->
-> Requirements:
->
-> - receive one Movie object through props
-> - display:
->   - poster
->   - title
->   - year
->   - type
-> - add a Favourite button, but do not connect it yet
-> - use the shared Movie type
-> - keep the component presentational
-> - do not call APIs
-> - do not use Firebase
-> - do not manage the movie list
->
-> Update HomeView to render MovieCard using .map().
-
-**Fix card heights**
-
-> fix css style for cards, they should visually be the same heights , but you can see that right now the height depends on the card's content. I provide the second screenshot for you to understand what I referring to
-
-**Home reload bug**
-
-> When I search a movie by character and press home, nothing is loaded, it should reload random movies, debug
-
----
-
-### 6. Firebase & favourites
-
-**Firebase setup**
-
-> Create and configure Firebase for the application.
->
-> Create:
->
-> src/services/firebaseService.ts
->
-> Requirements:
->
-> - initialize Firebase using environment variables
-> - export the database instance
-> - do not save or load any favourites yet
-> - do not modify HomeView
-> - do not add authentication
-
-**Favourites service functions**
-
-> Inside src/services/firebaseService.ts, add functions for managing favourite movies.
->
-> Create:
->
-> - addFavourite(movie: Movie): Promise\<void>
-> - removeFavourite(imdbID: string): Promise\<void>
-> - getFavourites(): Promise\<Movie[]>
->
-> Requirements:
->
-> - use imdbID as the unique movie identifier
-> - keep all Firebase communication inside this service
-> - return typed data
-> - throw readable errors when operations fail
-> - do not use React hooks
-> - do not update the UI yet
-
-**FavouritesModel**
-
-> Implement the Favourites model inside:
->
-> src/pages/Favourites/FavouritesModel.ts
->
-> Import the Firebase service functions.
->
-> Create and export:
->
-> - loadFavourites(): Promise\<Movie[]>
-> - saveFavourite(movie: Movie): Promise\<void>
-> - deleteFavourite(imdbID: string): Promise\<void>
->
-> Requirements:
->
-> - act as a wrapper around firebaseService
-> - do not call Firebase directly outside the service
-> - do not use React hooks
-> - do not manage loading or error state
-
-**useFavouritesViewModel**
-
-> Implement a custom hook inside:
->
-> src/pages/Favourites/useFavouritesViewModel.ts
->
-> Create and export:
->
-> useFavouritesViewModel()
->
-> Manage with useState:
->
-> - favourites
-> - loading
-> - error
->
-> Create functions:
->
-> - loadMovies()
-> - removeMovie(imdbID)
->
-> Requirements:
->
-> - use FavouritesModel only
-> - load favourites when the screen opens
-> - use useEffect for the initial load
-> - update local state after a movie is removed
-> - return all state and actions required by FavouritesView
-> - do not render JSX
-> - do not import firebaseService directly
-
-**FavouritesView**
-
-> Implement the Favourites view inside:
->
-> src/pages/Favourites/FavouritesView.tsx
->
-> Requirements:
->
-> - use useFavouritesViewModel
-> - display a loading message while loading
-> - display an error message when error exists
-> - render favourites using MovieCard and .map()
-> - show a friendly empty message when there are no favourites
-> - allow removing a movie from favourites
-> - do not call Firebase directly
-> - do not import FavouritesModel directly
-
-**Connect Favourite button / Realtime Database**
-
-> when i click a favourite button from the signle card of the movie, nothing happens and it should add that movie as favourite to the real time datase
-
-**User-scoped favourites**
-
-> Update the existing favourites service so favourites are stored under the signed-in user's profile.
->
-> Use this Real time DB structure:
->
-> users/{userId}/favourites/{imdbID}
->
-> Update the existing functions so they receive userId:
->
-> - addFavourite(userId: string, movie: Movie)
-> - removeFavourite(userId: string, imdbID: string)
-> - getFavourites(userId: string)
->
-> Requirements:
->
-> - use userId as the parent user document ID
-> - use imdbID as the favourite document ID
-> - preserve the existing function behaviour
-> - do not use React hooks
-> - do not access auth.currentUser inside the service
-> - throw a readable error when userId is missing
-
----
-
-### 7. Authentication
-
-**Firebase Auth + Firestore config**
-
-> Install Firebase and update the existing Firebase configuration.
->
-> Requirements:
->
-> - initialize Firebase Authentication using getAuth
-> - initialize Cloud Firestore using getFirestore
-> - export auth and db
-> - read Firebase configuration from Vite environment variables
-> - use the modern modular Firebase SDK
-> - do not add registration or login UI yet
-> - do not add anything new regarding favourites logic yet
->
-> Create or update:
->
-> src/services/firebaseService.ts
->
-> Also create an .env.example file containing placeholder Firebase environment variables.
-
-**authService**
-
-> Create:
->
-> src/services/authService.ts
->
-> Implement and export these functions:
->
-> - registerUser(email: string, password: string)
-> - loginUser(email: string, password: string)
-> - logoutUser()
-> - subscribeToAuthChanges(callback)
->
-> Requirements:
->
-> - use Firebase Authentication
-> - use createUserWithEmailAndPassword for registration
-> - use signInWithEmailAndPassword for login
-> - use signOut for logout
-> - use onAuthStateChanged inside subscribeToAuthChanges
-> - return typed Firebase User data where appropriate
-> - convert Firebase errors into readable messages
-> - do not use React hooks
-> - do not use useState or useEffect
-> - do not render JSX
-
-**Auth MVVM structure**
-
-> Create the MVVM file structure for authentication.
->
-> Create:
->
-> src/pages/Auth/AuthModel.ts
-> src/pages/Auth/useAuthViewModel.ts
-> src/pages/Auth/AuthView.tsx
->
-> Requirements:
->
-> - add minimal typed placeholder exports
-> - ensure the application still compiles
-> - do not implement registration or login yet
-> - do not add routing yet
-
-**AuthModel**
-
-> Implement src/pages/Auth/AuthModel.ts.
->
-> Import the authentication functions from authService.
->
-> Create and export:
->
-> - register(email: string, password: string)
-> - login(email: string, password: string)
-> - logout()
->
-> Responsibilities:
->
-> - trim and normalize the email address
-> - validate that the email and password are not empty
-> - validate that the password contains at least six characters
-> - call the corresponding authService function
-> - return the authenticated Firebase User
->
-> Do not use React hooks.
-> Do not call Firebase Authentication directly outside authService.
-> Do not manage UI state.
-
-**useAuthViewModel**
-
-> Implement the useAuthViewModel custom hook inside:
->
-> src/pages/Auth/useAuthViewModel.ts
->
-> Manage these values using useState:
->
-> - email
-> - password
-> - mode, which can be "login" or "register"
-> - loading
-> - error
->
-> Create these functions:
->
-> - handleSubmit()
-> - toggleMode()
->
-> Requirements:
->
-> - handleSubmit should call AuthModel.login when mode is "login"
-> - handleSubmit should call AuthModel.register when mode is "register"
-> - clear previous errors before submitting
-> - manage the loading state
-> - store readable errors
-> - clear the password after successful authentication
-> - return all state and functions needed by AuthView
-> - do not render JSX
-> - do not call Firebase directly
-> - do not import authService directly
-
-**AuthView**
-
-> Implement src/pages/Auth/AuthView.tsx.
->
-> Requirements:
->
-> - use useAuthViewModel
-> - display either "Login" or "Create Account" based on the current mode
-> - add a controlled email input
-> - add a controlled password input
-> - add a submit button
-> - disable the submit button while loading
-> - display readable validation or Firebase errors
-> - add a button for switching between login and registration
-> - submit the form using onSubmit
-> - prevent the default browser form submission
->
-> Do not call Firebase directly.
-> Do not import AuthModel or authService.
-
-**AuthContext**
-
-> Create a global authentication context.
->
-> Create:
->
-> src/context/AuthContext.tsx
->
-> Requirements:
->
-> - use onAuthStateChanged through authService
-> - store the current Firebase user
-> - store an authLoading state while Firebase restores the session
-> - expose:
->   - user
->   - authLoading
->   - logout
-> - wrap the application with AuthProvider
-> - unsubscribe from the authentication listener when the provider unmounts
-> - show a loading state while authentication is being initialized
-> - do not add favourites logic
-
-**Types organization**
-
-> move types under /types
-
-> what about index.ts
-
----
-
-### 8. Routing & auth UX
-
-**Routing**
-
-> Update the application routing.
->
-> Requirements:
->
-> - add an /auth route that displays AuthView
-> - allow HomeView to remain publicly accessible
-> - protect the /favourites route
-> - when an unauthenticated user opens /favourites, redirect them to /auth
-> - when an authenticated user opens /auth, redirect them to /
-> - preserve the Header on every page
-> - use the user and authLoading values from AuthContext
-
-**Unauth Favourite click → Favourites**
-
-> If I am unauth and click favourite button from the home page, redirect me to the favourites page
-
-**Move handleFavouriteClick to ViewModel**
-
-> the function handleFavouriteClick that handle the above action "If I am unauth and click favourite button from the home page, redirect me to the favourites page" should be created like from the exmaple of screenshot and after that move this to viewModel
-
-**Logout button**
-
-> add logout button as well and connect it with logout function
-
-**Move Login/Logout in Header**
-
-> transfer the Login/Logout button after the Favourites buttton
-
-**This README**
-
-> create me in read me all prompts that we used for this app
-
----
-
-## Scripts
-
-| Command           | Description              |
-| ----------------- | ------------------------ |
-| `npm run dev`     | Start development server |
-| `npm run build`   | Production build         |
-| `npm run preview` | Preview production build |
-| `npm run lint`    | Run oxlint               |
+Open the address shown in the terminal.
+
+Run the tests:
+
+```bash
+npm run test            # run once
+npm run test:coverage   # with coverage report
+```
+
+**Important:** `npm run dev` only runs the React app. The AI part (`/api/recommend`) is a Vercel function, so AI search does not work with `npm run dev`. To try it locally, use `npx vercel dev` (you need a free Vercel login). You can also test it on a Vercel preview deployment. Everything else works locally.
+
+### Environment variables
+
+Make a `.env` file in the main folder. It is ignored by git. Do not commit real values.
+
+| Name | Where it runs | What it is for |
+|---|---|---|
+| `VITE_OMDB_API_KEY` | browser | OMDb movie data (free key) |
+| `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`, `VITE_FIREBASE_DATABASE_URL`, `VITE_FIREBASE_PROJECT_ID`, `VITE_FIREBASE_STORAGE_BUCKET`, `VITE_FIREBASE_MESSAGING_SENDER_ID`, `VITE_FIREBASE_APP_ID` | browser | Firebase settings (these are public by design; Firebase rules protect the data) |
+| `GEMINI_API_KEY` | **server only** | Gemini key. Set in Vercel. The browser never sees it. |
+| `GEMINI_MODEL` | server only | Which Gemini model to use (default `gemini-3.5-flash-lite`) |
+| `GEMINI_FALLBACK_MODEL` | server only | Model to try once more if the first call fails with 503 or times out |
+
+## How the code is organised
+
+I use three parts: a **Model** (data and rules, no React), a **ViewModel** (React state and handlers) and a **View** (what you see).
+
+```
+api/
+  recommend.ts              Vercel function: checks input, calls Gemini, returns { titles }
+src/
+  components/               Header, MovieCard, ProtectedRoute, GuestRoute
+  pages/
+    Home/                   HomeModel.ts, useHomeViewModel.tsx, HomeView.tsx
+    Favourites/             FavouritesModel.ts, useFavouritesViewModel.ts, FavouritesView.tsx
+    Auth/                   AuthModel.ts, useAuthViewModel.ts, AuthView.tsx
+  services/
+    omdbMovieService.ts     talks to OMDb
+    recommendService.ts     talks to /api/recommend
+    authService.ts          Firebase login
+    firebaseService.ts      Firebase setup and favourites
+  test/                     test setup
+vercel.json                 makes direct links like /auth work (does not touch /api)
+```
+
+## How the AI part works
+
+```
+Text box (max 200 characters)
+  -> POST /api/recommend  { mood }
+  -> Vercel function checks the text and calls Gemini with the secret key
+  -> Gemini returns JSON: { "titles": [ 1 to 8 movie titles ] }
+  -> the function checks the JSON and sends it back
+  -> the app searches OMDb for each title, removes duplicates
+  -> movie cards under "Recommendations for: ..."
+```
+
+**The prompt.** I ask Gemini to return only JSON like `{"titles": string[]}` with 1 to 8 real movie titles that match the mood. No markdown, no extra text. The only thing sent as the user message is the mood text. The request also asks for JSON output with a schema, so the answer has the right shape.
+
+**Why I built it this way**
+- *A server function:* the API key must not go to the browser.
+- *Check the answer:* AI output can be wrong. The function removes code fences, uses `try/catch`, and checks that every title is a non-empty string.
+- *Gemini gives titles only:* OMDb gives the real movie data (poster, year, ID).
+- *Privacy:* only the mood text goes to Gemini. Never the email or user ID. The page tells users not to write personal information, because on the free plan Google may use the text to improve its products.
+
+**What happens when something fails**
+
+| Problem | Server answer | What the user sees |
+|---|---|---|
+| Text missing, not text, or too long | 400 | A clear message |
+| Gemini is busy (503) or too slow | one retry with the fallback model, then 502 | "The recommendation request timed out. Please try again." |
+| Too many requests (429) | 429 | "The AI service is busy, please try again later." |
+| Gemini returns bad JSON | 502 | "...invalid movie list." |
+| No titles found in OMDb | none | "No movies found for that mood." |
+
+In all these cases the normal movie list and the title search still work. Server logs only keep the status code or error name. They never keep the key or the user's text.
+
+## Tests
+
+I use Vitest and React Testing Library. There are 25 tests in 7 files. All pass.
+
+| File | Tests | What it checks |
+|---|---|---|
+| `recommendService.test.ts` | 4 | success, error message from the server, network failure, wrong JSON shape |
+| `HomeModel.test.ts` | 4 | short text rejected, duplicates removed, failed lookups skipped, empty result error |
+| `MovieCard.test.tsx` | 3 | shows data, favourite click, missing poster |
+| `HomeView.test.tsx` | 7 | label and max length, privacy note, submit, loading, error with `role="alert"`, results, empty state |
+| `ProtectedRoute.test.tsx` | 3 | loading, redirect when logged out, shows page when logged in |
+| `GuestRoute.test.tsx` | 2 | shows page when logged out, redirect when logged in |
+| `Header.test.tsx` | 2 | links when logged out (the logged-in state is not tested) |
+
+Coverage from `npm run test:coverage`: the `src/components` folder has 61.5%. `MovieCard` and `ProtectedRoute` have 100%. 5 of the 7 components and pages have tests. The whole project has only **17.6%**, because the Firebase code, the auth and favourites ViewModels and `useHomeViewModel` have no tests yet.
+
+Full report from `npm run test:coverage` (7 test files passed, 25 tests passed):
+
+```
+----------------------------|---------|----------|---------|---------|
+File                        | % Stmts | % Branch | % Funcs | % Lines |
+----------------------------|---------|----------|---------|---------|
+All files                   |   17.59 |    22.82 |   19.44 |    17.5 |
+ components                 |   61.53 |       75 |    37.5 |   61.53 |
+  GuestRoute.tsx            |   83.33 |       75 |     100 |   83.33 |
+  Header.tsx                |   35.71 |       50 |   16.66 |   35.71 |
+  ProtectedRoute.tsx        |     100 |      100 |     100 |     100 |
+ components/MovieCard       |     100 |      100 |     100 |     100 |
+ pages/Auth                 |       0 |        0 |       0 |       0 |
+ pages/Favourites           |       0 |        0 |       0 |       0 |
+ pages/Home                 |   19.54 |    32.14 |   28.57 |   19.69 |
+  HomeModel.ts              |   45.23 |       60 |   33.33 |   46.34 |
+  HomeView.tsx              |   63.63 |    85.71 |      50 |   63.63 |
+  useHomeViewModel.tsx      |       0 |        0 |       0 |       0 |
+ services                   |    16.5 |    16.43 |   22.22 |   15.68 |
+  recommendService.ts       |      85 |     92.3 |     100 |   84.21 |
+  authService.ts / firebaseService.ts / omdbMovieService.ts: 0 (not tested)
+```
+
+![Test coverage report](docs/screenshots/coverage.png)
+
+## Speed and accessibility
+
+| Lighthouse (live site) | Before | After |
+|---|---|---|
+| Performance | 87 | 88 (this is normal noise, not a real improvement) |
+| Accessibility | 100 | 100 |
+| Best Practices | 96 | 96 |
+| SEO | 91 | **100** |
+
+Both runs were done in a normal browser window (not private), so the numbers can be a little different from a clean run. What is left on Performance: unused JavaScript (about 163 KiB, one big 845 kB file) and movie posters that come from OMDb.
+
+**WAVE** (browser extension, full page): the home page has 0 errors, 0 contrast errors and 0 alerts. The `/auth` page also has 0, 0 and 0.
+
+**What I fixed because of the audits**
+1. *SEO 91 to 100:* I added a clear page title and a meta description in `index.html`.
+2. *WAVE alert "No heading structure":* I added an `<h1>` to the home page.
+3. *Found while testing:* opening `/auth` directly, or refreshing it, gave a 404 from Vercel. I fixed it with a rewrite rule in `vercel.json`. The rule does not touch `/api`.
+
+### Screenshots
+
+**Lighthouse before (SEO 91)**
+
+[Lighthouse before](docs/screenshots/lighthouse-before.png)
+
+**Lighthouse after (SEO 100)**
+
+[Lighthouse after](docs/screenshots/lighthouse-after.png)
+
+**WAVE: home page**
+
+[WAVE home page](docs/screenshots/wave-home.png)
+
+**WAVE: login page**
+
+[WAVE login page](docs/screenshots/wave-auth.png)
+
+**AI mood search working**
+
+[AI search success](docs/screenshots/ai-success.png)
+
+**When the AI fails, normal movies stay visible**
+
+[AI failure with fallback](docs/screenshots/ai-failure-fallback.png)
+
+## Deploying
+
+The site is on Vercel. The `main` branch goes to Production. Other branches get a preview link. The filled checklist, the rollback plan and the monitoring notes are in [`docs/DEPLOYMENT_CHECKLIST.md`](docs/DEPLOYMENT_CHECKLIST.md).
+
+## Known problems and what I would do next
+
+- **The free Gemini plan is not always reliable.** While building, I saw 503 (busy), timeouts, and a 404 (a model name that my key could not use). To handle this I made the model names settings, added one retry with a second model, and show clear messages. The normal search always works. A paid plan or another provider would be more stable.
+- **Sometimes the wrong movie shows.** The app uses the first OMDb result for each title. That can be a different movie with a similar name. Next step: search by exact title and year.
+- **OMDb limits.** One AI search can make up to 8 OMDb requests, and the free key has a daily limit. The OMDb key is also visible in the browser. It is a free key, so the risk is low, but it is not private.
+- **Not enough tests.** Firebase code, `useHomeViewModel`, `AuthView` and `FavouritesView` have no tests. The logged-in `Header` is not tested either.
+- **Weak empty-result check.** `useHomeViewModel` finds "no movies" by comparing an error message text. A proper error type would be safer.
+- **Big bundle.** One 845 kB JavaScript file. Splitting the code by page would help.
+- **`npm audit` shows 4 high-severity warnings.** I have not looked into them yet.
+- **Free plan and privacy.** Text sent to Gemini on the free plan may be used by Google. That is why the page has a warning.
